@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Year Progress Calendar</title>
+    <title>Month Progress Calendar</title>
     <style>
         * {
             box-sizing: border-box;
@@ -61,11 +61,11 @@
             margin-top: -2px;
         }
 
-        /* 콤팩트 정사각형 달력 본체 */
+        /* 콤팩트 정사각형 달력 본체 (화이트 배경으로 반전) */
         .widget-card {
             width: 205px;
             height: 205px;
-            background-color: #FFF0F7;
+            background-color: #FFFFFF;
             border: 1px solid #DBD5D7;
             border-radius: 18px;
             overflow: hidden;
@@ -74,16 +74,16 @@
             box-shadow: 0 6px 14px rgba(97, 83, 87, 0.08);
         }
 
-        /* 달력 상단 헤더 바 (제본 영역) */
+        /* 달력 상단 헤더 바 (제본 영역 - 은은한 핑크 톤) */
         .calendar-top-bar {
             width: 100%;
             height: 22px;
             flex-shrink: 0;
-            background-color: rgba(219, 213, 215, 0.38);
+            background-color: #FFF0F7;
             border-bottom: 1px dashed #DBD5D7;
         }
 
-        /* 본문 영역: 내부 콘텐츠 전체를 수직/수평 정중앙에 균형 있게 배치 */
+        /* 본문 영역 */
         .calendar-body {
             width: 100%;
             flex: 1;
@@ -95,25 +95,25 @@
             gap: 13px;
         }
 
-        /* 연도 + 밑줄 */
-        .year-wrapper {
+        /* 월 표시 + 밑줄 */
+        .month-wrapper {
             padding-bottom: 3px;
             border-bottom: 1px solid #DBD5D7;
             display: inline-block;
         }
 
-        .year-title {
-            font-size: 21px;
+        .month-title {
+            font-size: 20px;
             font-weight: 800;
             color: #615357;
             letter-spacing: 0.5px;
             line-height: 1;
         }
 
-        /* 그래프 영역 (하얀 배경 네모 박스) */
+        /* 그래프 영역 (연핑크 배경 네모 박스로 반전) */
         .progress-box {
             width: 100%;
-            background-color: rgba(255, 255, 255, 0.65);
+            background-color: #FFF0F7;
             border-radius: 12px;
             padding: 8px 10px 7px;
             display: flex;
@@ -179,7 +179,6 @@
             flex: 1;
         }
 
-        /* 숫자 크기 축소 및 한글 라벨과 동일한 은은한 톤 적용 */
         .stat-number {
             font-size: 12px;
             font-weight: 700;
@@ -221,14 +220,14 @@
             <!-- 상단 달력 헤더 바 & 절취선 -->
             <div class="calendar-top-bar"></div>
 
-            <!-- 본문: 전체 요소가 카드 내부 중앙에 균형 있게 배치됨 -->
+            <!-- 본문 -->
             <div class="calendar-body">
-                <!-- 연도 + 밑줄 -->
-                <div class="year-wrapper">
-                    <div class="year-title" id="yearText">2026</div>
+                <!-- 해당 월 + 밑줄 -->
+                <div class="month-wrapper">
+                    <div class="month-title" id="monthText">November</div>
                 </div>
 
-                <!-- 하얀색 박스로 감싼 그래프 영역 -->
+                <!-- 연핑크 박스로 감싼 그래프 영역 -->
                 <div class="progress-box">
                     <div class="percent-track">
                         <span class="percent-badge" id="percentText">0.00%</span>
@@ -237,8 +236,8 @@
                         <div class="progress-bar-fill" id="progressFill"></div>
                     </div>
                     <div class="date-range">
-                        <span>Jan 1</span>
-                        <span>Dec 31</span>
+                        <span id="startDateText">Nov 1</span>
+                        <span id="endDateText">Nov 30</span>
                     </div>
                 </div>
 
@@ -255,7 +254,7 @@
                     </div>
                     <div class="divider"></div>
                     <div class="stat-item">
-                        <span class="stat-number" id="totalDays">365</span>
+                        <span class="stat-number" id="totalDays">30</span>
                         <span class="stat-desc">전체</span>
                     </div>
                 </div>
@@ -264,24 +263,33 @@
     </div>
 
     <script>
-        function updateYearProgress() {
+        function updateMonthProgress() {
             const now = new Date();
             const year = now.getFullYear();
-            
-            const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-            const totalDays = isLeapYear ? 366 : 365;
+            const month = now.getMonth(); // 0 ~ 11
 
-            const today = new Date(year, now.getMonth(), now.getDate());
-            const start = new Date(year, 0, 1);
-            
-            const passedDays = Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1;
+            const monthNamesFull = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            const monthNamesShort = [
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            ];
+
+            // 해당 월의 마지막 날짜(전체 일수) 자동 계산 (윤년 2월 29일 포함)
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const passedDays = now.getDate();
             const leftDays = totalDays - passedDays + 1;
-            
+
             const rawPercent = (passedDays / totalDays) * 100;
             const percent = rawPercent.toFixed(2);
 
             const percentEl = document.getElementById('percentText');
-            document.getElementById('yearText').textContent = year;
+            document.getElementById('monthText').textContent = monthNamesFull[month];
+            document.getElementById('startDateText').textContent = monthNamesShort[month] + ' 1';
+            document.getElementById('endDateText').textContent = monthNamesShort[month] + ' ' + totalDays;
+
             percentEl.textContent = percent + '%';
             document.getElementById('progressFill').style.width = percent + '%';
 
@@ -293,7 +301,7 @@
             document.getElementById('totalDays').textContent = totalDays;
         }
 
-        updateYearProgress();
+        updateMonthProgress();
     </script>
 </body>
 </html>
