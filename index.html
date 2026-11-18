@@ -61,7 +61,7 @@
             margin-top: -2px;
         }
 
-        /* 콤팩트 정사각형 달력 본체 (화이트 배경으로 반전) */
+        /* 콤팩트 정사각형 달력 본체 (화이트 배경) */
         .widget-card {
             width: 205px;
             height: 205px;
@@ -95,7 +95,7 @@
             gap: 13px;
         }
 
-        /* 월 표시 + 밑줄 */
+        /* 한글 월 표시 + 밑줄 */
         .month-wrapper {
             padding-bottom: 3px;
             border-bottom: 1px solid #DBD5D7;
@@ -110,7 +110,7 @@
             line-height: 1;
         }
 
-        /* 그래프 영역 (연핑크 배경 네모 박스로 반전) */
+        /* 그래프 영역 (연핑크 배경 네모 박스) */
         .progress-box {
             width: 100%;
             background-color: #FFF0F7;
@@ -222,9 +222,9 @@
 
             <!-- 본문 -->
             <div class="calendar-body">
-                <!-- 해당 월 + 밑줄 -->
+                <!-- 한글 월 + 밑줄 -->
                 <div class="month-wrapper">
-                    <div class="month-title" id="monthText">November</div>
+                    <div class="month-title" id="monthText">11월</div>
                 </div>
 
                 <!-- 연핑크 박스로 감싼 그래프 영역 -->
@@ -236,8 +236,8 @@
                         <div class="progress-bar-fill" id="progressFill"></div>
                     </div>
                     <div class="date-range">
-                        <span id="startDateText">Nov 1</span>
-                        <span id="endDateText">Nov 30</span>
+                        <span id="startDateText">11/1</span>
+                        <span id="endDateText">11/30</span>
                     </div>
                 </div>
 
@@ -266,18 +266,8 @@
         function updateMonthProgress() {
             const now = new Date();
             const year = now.getFullYear();
-            const month = now.getMonth(); // 0 ~ 11
+            const month = now.getMonth(); // 0 (1월) ~ 11 (12월)
 
-            const monthNamesFull = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-            const monthNamesShort = [
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-            ];
-
-            // 해당 월의 마지막 날짜(전체 일수) 자동 계산 (윤년 2월 29일 포함)
             const totalDays = new Date(year, month + 1, 0).getDate();
             const passedDays = now.getDate();
             const leftDays = totalDays - passedDays + 1;
@@ -286,9 +276,11 @@
             const percent = rawPercent.toFixed(2);
 
             const percentEl = document.getElementById('percentText');
-            document.getElementById('monthText').textContent = monthNamesFull[month];
-            document.getElementById('startDateText').textContent = monthNamesShort[month] + ' 1';
-            document.getElementById('endDateText').textContent = monthNamesShort[month] + ' ' + totalDays;
+            
+            // 한글 월 표시 및 날짜 범위 매칭
+            document.getElementById('monthText').textContent = (month + 1) + '월';
+            document.getElementById('startDateText').textContent = (month + 1) + '/1';
+            document.getElementById('endDateText').textContent = (month + 1) + '/' + totalDays;
 
             percentEl.textContent = percent + '%';
             document.getElementById('progressFill').style.width = percent + '%';
